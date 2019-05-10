@@ -8,6 +8,7 @@ Created on Fri May  3 21:30:53 2019
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 from flask_bcrypt import Bcrypt
+from flask_login import LoginManager
 
 
 app = Flask(__name__)
@@ -17,5 +18,6 @@ app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///site.db'
 
 db=SQLAlchemy(app)
 bcrypt=Bcrypt(app)
+login_manager=LoginManager(app)
 
 from flaskblog import routes
