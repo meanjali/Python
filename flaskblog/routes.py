@@ -6,31 +6,17 @@ Created on Fri May  3 22:12:42 2019
 """
 from flask import render_template,url_for,flash,redirect,request
 from flaskblog.models import User,Post
-from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm
+from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm,PostForm
 from flaskblog import app,db,bcrypt
 from flask_login import login_user,current_user,logout_user,login_required
 import secrets
 import os
 from PIL import Image
 
-posts=[
-       {
-          'author':'Anjali Chachra',
-          'title':'C Programming',
-          'content':'First post',
-          'date_posted':'May 24, 2019'
-
-        },
-        {
-        'author':'Leena Sahu',
-        'title':'Java Programming',
-        'content':'Second post',
-        'date_posted':'May 28, 2019'
-                }]
-
 @app.route('/')
 @app.route('/home')
 def hello_world():
+    posts=Post.query.all()
     return render_template('home.html',posts=posts)
 
 @app.route('/about')
@@ -103,3 +89,16 @@ def account():
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template('account.html', title='Account',
                            image_file=image_file, form=form)
+
+
+@app.route("/post/new",methods=['GET', 'POST'])
+@login_required
+def new_post():
+    form=PostForm()
+    if form.validate_on_submit():
+        post=Post(title=form.title.data,content=form.content.data,author=current_user)
+        db.session.add(post)
+        db.session.commit()
+        flash('Your post is created!','success')
+        return redirect(url_for('hello_world'))
+    return render_template('create_post.html', title='New Post',form=form)
